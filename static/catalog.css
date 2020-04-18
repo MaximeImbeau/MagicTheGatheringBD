@@ -1,0 +1,22 @@
+html {
+    background-color: black;
+}
+
+.card-list {
+    text-align: center;
+}
+
+.card {
+    display: inline-block;
+    width: 430px;
+    height: 599px;
+    margin-bottom: 5px;
+    border: 3px solid beige;
+    border-radius: 5px;
+    color: beige;
+}
+
+img {
+    max-width: 100%;
+    max-height: 100%;
+}

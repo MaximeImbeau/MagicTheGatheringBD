@@ -1,0 +1,6 @@
+CREATE DATABASE testdb;
+USE testdb;
+CREATE TABLE Utilisateurs(courriel varchar(50), motpasse varchar(12), nom varchar(20), avatar varchar(40));
+INSERT INTO Utilisateurs VALUES("alice@ulaval.ca","12345","Alice", "MonChat.jpg"),("bob@ulaval.ca","qwerty","Bob", "Grimlock.jpg"),("cedric@ulaval.ca","password","C�dric","smiley.gif"),("denise@ulaval.ca","88888888","Denise","reine.jpg");
+CREATE TABLE Cards(name varchar(50), color enum('black', 'blue', 'white', 'red', 'green'), manaCost integer, rarity varchar(10), type varchar(15), imageSource varchar(100));
+INSERT INTO Cards VALUES ('Air Elemental', 'blue', 3, 'Uncommon', 'creature', 'https://img.scryfall.com/cards/large/front/f/9/f9de2b27-f7d1-4e2d-97b2-2bb236b6fb10.jpg?1562002439'), ('Mountain', 'red', 0, 'Common', 'land', 'https://img.scryfall.com/cards/large/front/4/7/47a55065-555a-4bdb-8ab1-8830ca5ba6fd.jpg?1562610993'), ('Icatian Scout', 'white', 1, 'Common', 'creature', 'https://img.scryfall.com/cards/large/front/d/b/db63ad7f-6dc4-4249-b360-46ec5569a5a9.jpg?1562935964'), ('Nylea, Keen-Eyed', 'green', 3, 'Mythic', 'creature', 'https://img.scryfall.com/cards/large/front/2/a/2a022e36-5074-4875-ac30-aaa09b7ef421.jpg?1581481404');
