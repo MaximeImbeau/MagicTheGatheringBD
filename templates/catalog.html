@@ -1,9 +1,8 @@
-<html>
+{% extends "navbar.html" %}
+{% block content %}
     <head>
     <title>Welcome to MagicShop!</title>
     <link rel="stylesheet" type="text/css" href="../static/catalog.css">
-    <script type="text/javascript" src="../static/catalog.js">
-    </script>
     </head>
 
     <body>
@@ -13,4 +12,4 @@
             {% endfor %}
         </div>
     </body>
-</html>
+{% endblock %}

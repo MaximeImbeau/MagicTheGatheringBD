@@ -1,0 +1,21 @@
+<html>
+    <head>
+        <title>Welcome to MagicShop!</title>
+        <link rel="stylesheet" type="text/css" href="../static/navbar.css">
+    </head>
+    <body>
+        <header>
+            <div class="navbar">
+                <h1 class="title"> MagicShop</h1>
+                <div class="links">
+                    <a href="http://localhost:5000"> Home </a>
+                    <a href="http://localhost:5000/catalog"> Catalog </a>
+                </div>
+            </div>
+        </header>
+        <div class="container">
+            {% block content %}
+            {% endblock %}
+        </div>
+    </body>
+</html>

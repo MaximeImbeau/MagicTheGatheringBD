@@ -7,7 +7,7 @@ card_names = []
 image_sources = []
 
 
-@app.route("/")
+@app.route("/catalog")
 def get_cards():
     global card_names
     global image_sources
@@ -26,10 +26,12 @@ def get_cards():
         card_names.append(d[0])
         image_sources.append(d[5])
 
-    print(card_names)
-    print(image_sources)
-
     return render_template('catalog.html', names=card_names, image_sources=image_sources)
+
+
+@app.route("/")
+def home():
+    return render_template('navbar.html')
 
 
 if __name__ == "__main__":
