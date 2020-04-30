@@ -16,7 +16,7 @@ def get_cards():
     image_sources = []
 
     conn = pymysql.connect(host='localhost', user='root', password='kroot', db='testdb')
-    cmd = 'SELECT * FROM Cards' + ';'
+    cmd = 'SELECT * FROM cards' + ';'
     cur = conn.cursor()
     cur.execute(cmd)
 
@@ -24,7 +24,7 @@ def get_cards():
 
     for d in data:
         card_names.append(d[0])
-        image_sources.append(d[5])
+        image_sources.append(d[4])
 
     return render_template('catalog.html', names=card_names, image_sources=image_sources)
 
