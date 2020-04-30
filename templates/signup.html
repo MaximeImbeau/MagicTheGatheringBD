@@ -1,0 +1,20 @@
+<html>
+    <head>
+        <title>Page d'inscription</title>
+        <script type="text/javascript" src="../static/MonFichierCode.js"></script>
+    </head>
+<body onload="SupprimerContenu()">
+    <p>Entrez vos informations puis faites soumettre.</p>
+    <form action="signup" method="post">
+        <p>
+            Courriel: <input type="text" name="courriel"><br>
+            Mot de passe: <input type="text" name="motpasse"><br>
+            Pseudo: <input type="text" name="nom">
+        </p><br>
+        <input type="submit" value="Inscription" name="soumettre">
+    </form>
+        {% if message %}
+        <div>{{ message }}</div>
+        {% endif %}
+</body>
+</html>

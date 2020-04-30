@@ -15,9 +15,10 @@ def login():
     courriel = '"' + request.form.get('courriel') + '"'
     passe = request.form.get('motpasse')
 
-    conn = pymysql.connect(host='localhost', user='root', password='kroot', db='testdb')
-    cmd = 'SELECT motpasse FROM Utilisateurs WHERE courriel=' + courriel + ';'
-    cur = conn.cursor()
+    conn= pymysql.connect(host='localhost',user='root', password='mtgserver',db='testdb')
+    cmd='SELECT motpasse FROM utilisateurs WHERE courriel='+courriel+';'
+    cur=conn.cursor()
+
     cur.execute(cmd)
     passeVrai = cur.fetchone()
 

@@ -1,6 +1,12 @@
 CREATE DATABASE IF NOT EXISTS testdb;
 USE testdb;
 
+CREATE TABLE IF NOT EXISTS Utilisateurs(courriel varchar(50), motpasse varchar(12), nom varchar(20), avatar varchar(40));
+INSERT INTO Utilisateurs VALUES("alice@ulaval.ca","12345","Alice", "MonChat.jpg"),("bob@ulaval.ca","qwerty","Bob", "Grimlock.jpg"),("cedric@ulaval.ca","password","C�dric","smiley.gif"),("denise@ulaval.ca","88888888","Denise","reine.jpg");
+
+CREATE TABLE IF NOT EXISTS Utilisateur(courriel varchar(50), motpasse varchar(12), nom varchar (20), balance float(4, 2) DEFAULT 0.0, PRIMARY KEY (courriel));
+INSERT INTO Utilisateur(courriel, motpasse, nom) VALUES("edgeLord@mail.com", "pain", "Bob");
+
 CREATE TABLE IF NOT EXISTS cards(name varchar(50), manaCost integer, rarity varchar(15), type varchar(15), imageSource varchar(100), PRIMARY KEY (name));
 INSERT INTO cards VALUES ('Air Elemental', 3, 'uncommon', 'creature', 'https://img.scryfall.com/cards/large/front/f/9/f9de2b27-f7d1-4e2d-97b2-2bb236b6fb10.jpg?1562002439'),
 ('Ifnir Deadlands', 0, 'common', 'land', 'https://img.scryfall.com/cards/large/front/0/b/0b88728b-9b18-40c6-b634-f87f8da83665.jpg?1562788706'),
