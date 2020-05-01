@@ -2,18 +2,21 @@
 {% block content %}
     <head>
         <title>Page d'inscription</title>
+        <link rel="stylesheet" type="text/css" href="../static/signup.css">
         <script type="text/javascript" src="../static/MonFichierCode.js"></script>
     </head>
 <body onload="SupprimerContenu()">
-    <p>Entrez vos informations puis faites soumettre.</p>
-    <form action="signup" method="post">
-        <p>
-            Courriel: <input type="text" name="courriel"><br>
-            Mot de passe: <input type="text" name="motpasse"><br>
-            Pseudo: <input type="text" name="nom">
-        </p><br>
+    <h1>Créer votre compte</h1>
+    <div style="text-align:center">
+        <form action="signup" method="post">
+            <p>
+                Nom d'utilisateur <input type="text" name="nom">
+                Courriel <input type="text" name="courriel"<br>
+                Mot de passe <input type="text" name="motpasse"<br>
+            </p><br>
         <input type="submit" value="Inscription" name="soumettre">
-    </form>
+        </form>
+    </div>
         {% if message %}
         <div>{{ message }}</div>
         {% endif %}
