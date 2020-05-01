@@ -1,0 +1,15 @@
+{% extends "navbar.html" %}
+{% block content %}
+    <head>
+    <title>Welcome to MagicShop!</title>
+    <link rel="stylesheet" type="text/css" href="../static/catalog.css">
+    </head>
+
+    <body>
+        <div class="card-list">
+            {% for item in image_sources %}
+            <div class="card"> <img src={{item}}> </div>
+            {% endfor %}
+        </div>
+    </body>
+{% endblock %}
