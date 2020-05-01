@@ -1,5 +1,7 @@
 from flask import Flask, render_template, request
 import pymysql, pymysql.cursors
+import uuid
+import hashlib
 
 app = Flask(__name__)
 ProfileUtilisateur = {}
@@ -7,6 +9,8 @@ ProfileUtilisateur = {}
 #For catalog
 card_names = []
 image_sources = []
+
+selectedCards = []
 
 
 @app.route("/")
@@ -18,6 +22,9 @@ def main():
 def login():
     courriel = '"' + request.form.get('courriel') + '"'
     passe = request.form.get('motpasse')
+    hashTable = hashlib.new('ripemd160')
+    hashTable.update(passe.encode('utf-8'))
+
 
     conn= pymysql.connect(host='localhost',user='root', password='mtgserver',db='testdb')
     cmd='SELECT motpasse FROM Utilisateur WHERE courriel='+courriel+';'
@@ -26,7 +33,7 @@ def login():
     cur.execute(cmd)
     passeVrai = cur.fetchone()
 
-    if (passeVrai != None) and (passe == passeVrai[0]):
+    if (passeVrai != None) and (hashTable.hexdigest() == passeVrai[0]):
         cmd = 'SELECT * FROM Utilisateur WHERE courriel=' + courriel + ';'
         cur = conn.cursor()
         cur.execute(cmd)
@@ -49,15 +56,20 @@ def renderSignUpPage():
 @app.route("/signup", methods=['POST'])
 def signup():
 
-    courriel = '"' + request.form.get('courriel') + '"'
+    courriel = "'" + request.form.get('courriel') + "'"
     if ("@" not in courriel):
         return render_template('signup.html', message="Courriel invalide")
 
-    motpasse = '"' + request.form.get('motpasse') + '"'
-    nom = '"' + request.form.get('nom') + '"'
+    password = request.form.get('motpasse')
+    hashTable = hashlib.new('ripemd160')
+    hashTable.update(password.encode('utf-8'))
+
+
+
+    nom = "'" + request.form.get('nom') + "'"
 
     conn = pymysql.connect(host='localhost', user='root', password='mtgserver', db='testdb')
-    cmd = 'INSERT INTO Utilisateur(courriel, motpasse, nom) VALUES('+courriel+','+motpasse+','+nom+');'
+    cmd = 'INSERT INTO Utilisateur(courriel, motpasse, nom) VALUES('+courriel+','+ "'" + hashTable.hexdigest() + "'" +','+nom+');'
     cur = conn.cursor()
     try:
         cur.execute(cmd)
@@ -66,6 +78,15 @@ def signup():
     conn.commit()
     conn.close()
     return render_template('login.html')
+
+
+@app.route("/decks")
+def renderDeckPage():
+    return render_template('decks.html')
+
+
+
+
 
 @app.route("/catalog")
 def get_cards():
