@@ -42,7 +42,7 @@ def login():
         global ProfileUtilisateur
         ProfileUtilisateur["courriel"] = courriel
         ProfileUtilisateur["nom"] = info[2]
-        return render_template('bienvenu.html', profile=ProfileUtilisateur)
+        return render_template('user.html', ownership=True, userMail=request.form.get('courriel'))
 
     return render_template('login.html', message="Informations invalides!")
 
@@ -79,13 +79,32 @@ def signup():
     return render_template('login.html')
 
 
-@app.route("/decks")
-def renderDeckPage():
-    return render_template('decks.html')
+@app.route("/user/<userMail>")
+def renderDeckPage(userMail):
+    ownership = False
+    if ('"' + userMail + '"') == ProfileUtilisateur["courriel"]:
+        ownership = True
+    return render_template('user.html', ownership=ownership, userMail=userMail)
 
 
+@app.route("/user/<userMail>/decks", methods=['POST'])
+def createNewDeck(userMail):
+    deckId = '"'+str(uuid.uuid4())+'"'
+    deckName = '"'+request.form.get('deckName')+'"'
 
+    ownerMail = '"'+userMail+'"'
 
+    insertDeckCmd = "INSERT INTO Decks VALUES ("+deckId+','+deckName+');'
+    insertDeckOwnerShipCmd = "INSERT INTO Deck_Owners VALUES ("+deckId+','+ownerMail+');'
+
+    conn = pymysql.connect(host='localhost', user='root', password='mtgserver', db='testdb')
+    cur = conn.cursor()
+    cur.execute(insertDeckCmd)
+    cur.execute(insertDeckOwnerShipCmd)
+    conn.commit()
+    conn.close()
+
+    return render_template('user.html', ownership=True, userMail=userMail)
 
 @app.route("/catalog")
 def get_cards():

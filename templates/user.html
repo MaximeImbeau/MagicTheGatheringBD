@@ -1,0 +1,16 @@
+{% extends "navbar.html" %}
+{% block content %}
+<head>
+    <title>User Page</title>
+</head>
+<body>
+        {% if ownership == True %}
+            <form action="/../user/{{ userMail }}/decks" method="post">
+                <p>
+                    New Deck name: <input type="text" name="deckName"><br>
+                </p><br>
+                <input type="submit" value="Create" name="soumettre">
+            </form>
+        {% endif %}
+</body>
+{% endblock %}
