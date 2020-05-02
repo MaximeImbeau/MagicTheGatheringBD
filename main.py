@@ -26,7 +26,7 @@ def login():
     hashTable.update(passe.encode('utf-8'))
 
 
-    conn= pymysql.connect(host='localhost',user='root', password='mtgserver',db='testdb')
+    conn= pymysql.connect(host='localhost',user='root', password='root',db='testdb')
     cmd='SELECT motpasse FROM Utilisateur WHERE courriel='+courriel+';'
     cur=conn.cursor()
 
