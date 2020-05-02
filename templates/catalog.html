@@ -6,10 +6,22 @@
     </head>
 
     <body>
+        <form action="catalog" method="post">
+            <div>
+            Card to add to selection: <input type="text" name="cardName">
+            <input type="submit" value="Add to Selection" name="soumettre">
+                {% if message == "This card is not in the catalog" %}
+                    <span style="color:red">{{ message }}</span>
+                {% endif %}
+                {% if message == "The card was added to your Selection" %}
+                    <span style="color:wheat">{{ message }}</span>
+                {% endif %}
+            </div>
+        </form>
         <div class="card-list">
             {% for item in image_sources %}
             <div class="card"> <img src={{item}}> </div>
             {% endfor %}
         </div>
     </body>
-pyt
+{% endblock %}

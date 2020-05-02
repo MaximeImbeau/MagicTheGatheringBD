@@ -41,7 +41,6 @@ def login():
 
         global ProfileUtilisateur
         ProfileUtilisateur["courriel"] = courriel
-        print(info)
         ProfileUtilisateur["nom"] = info[2]
         return render_template('bienvenu.html', profile=ProfileUtilisateur)
 
@@ -108,6 +107,21 @@ def get_cards():
         image_sources.append(d[4])
 
     return render_template('catalog.html', names=card_names, image_sources=image_sources)
+
+
+@app.route("/catalog", methods=['POST'])
+def addSelectedCard():
+    cardName = request.form.get('cardName')
+
+    conn = pymysql.connect(host='localhost', user='root', password='mtgserver', db='testdb')
+    cmd = 'SELECT * FROM Cards WHERE name=' + "'" + cardName + "'" + ";"
+    cur = conn.cursor()
+    if cur.execute(cmd) == 0:
+        return render_template('catalog.html', names=card_names, image_sources=image_sources, message="This card is not in the catalog")
+    selectedCards.append(cardName)
+    conn.close()
+    return render_template('catalog.html', names=card_names, image_sources=image_sources, message="The card was added to your Selection")
+
 
 if __name__ == "__main__":
     app.run()
