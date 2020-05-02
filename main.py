@@ -6,6 +6,8 @@ import hashlib
 app = Flask(__name__)
 ProfileUtilisateur = {}
 
+motDePasseDeLaDB = "mtgserver"
+
 #For catalog
 card_names = []
 image_sources = []
@@ -26,7 +28,7 @@ def login():
     hashTable.update(passe.encode('utf-8'))
 
 
-    conn= pymysql.connect(host='localhost',user='root', password='root',db='testdb')
+    conn= pymysql.connect(host='localhost',user='root', password=motDePasseDeLaDB ,db='testdb')
     cmd='SELECT motpasse FROM Utilisateur WHERE courriel='+courriel+';'
     cur=conn.cursor()
 
@@ -67,7 +69,7 @@ def signup():
 
     nom = "'" + request.form.get('nom') + "'"
 
-    conn = pymysql.connect(host='localhost', user='root', password='mtgserver', db='testdb')
+    conn = pymysql.connect(host='localhost', user='root', password=motDePasseDeLaDB, db='testdb')
     cmd = 'INSERT INTO Utilisateur(courriel, motpasse, nom) VALUES('+courriel+','+ "'" + hashTable.hexdigest() + "'" +','+nom+');'
     cur = conn.cursor()
     try:
@@ -97,7 +99,7 @@ def createNewDeck(userMail):
     insertDeckCmd = "INSERT INTO Decks VALUES ("+deckId+','+deckName+');'
     insertDeckOwnerShipCmd = "INSERT INTO Deck_Owners VALUES ("+deckId+','+ownerMail+');'
 
-    conn = pymysql.connect(host='localhost', user='root', password='mtgserver', db='testdb')
+    conn = pymysql.connect(host='localhost', user='root', password=motDePasseDeLaDB, db='testdb')
     cur = conn.cursor()
     cur.execute(insertDeckCmd)
     cur.execute(insertDeckOwnerShipCmd)
@@ -114,7 +116,7 @@ def get_cards():
     card_names = []
     image_sources = []
 
-    conn = pymysql.connect(host='localhost', user='root', password='mtgserver', db='testdb')
+    conn = pymysql.connect(host='localhost', user='root', password=motDePasseDeLaDB, db='testdb')
     cmd = 'SELECT * FROM cards' + ';'
     cur = conn.cursor()
     cur.execute(cmd)
@@ -132,7 +134,7 @@ def get_cards():
 def addSelectedCard():
     cardName = request.form.get('cardName')
 
-    conn = pymysql.connect(host='localhost', user='root', password='mtgserver', db='testdb')
+    conn = pymysql.connect(host='localhost', user='root', password=motDePasseDeLaDB, db='testdb')
     cmd = 'SELECT * FROM Cards WHERE name=' + "'" + cardName + "'" + ";"
     cur = conn.cursor()
     if cur.execute(cmd) == 0:

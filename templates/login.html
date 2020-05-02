@@ -8,9 +8,9 @@
     <body onload="SupprimerContenu()">
         <h1 class="centre">Connectez-vous avec votre compte</h1>
         <form action="login" method="post">
-            <input type="email" placeholder="Courriel"</input>
-            <input type="password" placeholder="Mot de passe"</input>
-            <input type="submit" value="Identification"</input>
+            <input type="email" placeholder="Courriel" name="courriel">
+            <input type="password" placeholder="Mot de passe" name="motpasse">
+            <input type="submit" value="Identification">
         </form>
         {% if message %}
         <div id="cadre">{{ message }}"</div>
