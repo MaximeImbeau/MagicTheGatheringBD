@@ -7,11 +7,11 @@
     </head>
 <body onload="SupprimerContenu()">
     <h1>Créer votre compte</h1>
-        <form action="login" method="post">
-            <input type="text" placeholder="Nom d'utilisateur"<input>
-            <input type="email" placeholder="Courriel"<input>
-            <input type="password" placeholder="Mot de passe"<input>
-            <input type="submit" name="Inscription"<input>
+        <form action="signup" method="post">
+            <input type="text" placeholder="Nom d'utilisateur"</input>
+            <input type="email" placeholder="Courriel"</input>
+            <input type="password" placeholder="Mot de passe"</input>
+            <input type="submit" value="Inscription"</input>
         </form>
         {% if message %}
         <div>{{ message }}</div>
