@@ -19,14 +19,15 @@ header {
 }
 
 .title {
+    font:20px Open source;
     color: white;
 }
 
 .links {
-    width: 10%;
+    width: 30%;
     display: flex;
     justify-content: space-around;
-    align-items: center;
+    align-items: left;
 }
 
 li {
@@ -35,4 +36,5 @@ li {
 
 a {
     color: white;
+
 }
