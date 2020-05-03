@@ -1,0 +1,51 @@
+body {
+    background:url(https://cdn.shopify.com/s/files/1/2930/2308/products/dark-background-with-marble-texture-backdrop-for-photography_1024x1024.jpg?v=1551510514);
+}
+h1 {
+  text-align: center;
+  padding:50px 0px 0px 0px;
+  text-transform:uppercase;
+  font:20px Arial;
+  color: white;
+  margin-bottom: 0px;
+}
+form {
+  width: 400px;
+  color: white;
+  margin:50px auto;
+  text-shadow:#000 0px 1px 5px;
+  text-align: center;
+}
+input{
+padding: 13px;
+font: 15px Arial;
+}
+input[type=email] {
+  display: block;
+  width: 100%;
+  margin-bottom: 50px;
+  box-sizing: border-box;
+  border-radius: 3px;
+  color: #6E6E6E;
+  text-align: left;
+  background: rgba(0,0,0,0.5);
+}
+input[type=password] {
+  display: block;
+  width: 100%;
+  margin-bottom: 50px;
+  box-sizing: border-box;
+  border-radius: 3px;
+  color: white;
+  text-align: left;
+  background: rgba(0,0,0,0.5);
+}
+input[type=submit]{
+  display: block;
+  width: 100%;
+  text-align: center;
+  border-radius:5px;
+  text-transform:uppercase;
+  background-color: #2E906F;
+  color: white;
+}
