@@ -1,0 +1,21 @@
+img {
+    width: 30%;
+    align-items: center;
+}
+
+#card {
+    display: flex;
+    justify-content: space-evenly;
+}
+
+#cardDetails {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    font-size: x-large;
+    font-weight: bolder;
+}
+
+p {
+    color: white;
+}
