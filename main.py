@@ -97,7 +97,7 @@ def getUserDecks(userMail):
             ownership = True
 
     conn = pymysql.connect(host='localhost', user='root', password=motDePasseDeLaDB, db='testdb')
-    cmd = 'Select nom FROM Decks D INNER JOIN Deck_Owners D_O ON D.deckId = D_O.deckId WHERE owner_email = '+'"'+userMail+'";'
+    cmd = 'Select nom, D.deckId FROM Decks D INNER JOIN Deck_Owners D_O ON D.deckId = D_O.deckId WHERE owner_email = '+'"'+userMail+'"'+ "ORDER BY nom ;"
     cur = conn.cursor()
     cur.execute(cmd)
 
@@ -124,6 +124,9 @@ def createNewDeck(userMail):
     conn.close()
 
     return render_template('user.html', ownership=True, userMail=userMail)
+
+
+
 
 @app.route("/catalog")
 def get_cards():

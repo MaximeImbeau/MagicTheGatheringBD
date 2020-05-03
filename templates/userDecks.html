@@ -2,7 +2,7 @@
 {% block content %}
 <head>
     <title>User Page</title>
-    <link rel="stylesheet" type="text/css" href="/../static/userDeck.css">
+    <link rel="stylesheet" type="text/css" href="/../static/userDeck.css?v=1.7">
 </head>
 <body>
         {% if ownership == True %}
@@ -13,13 +13,21 @@
                 <input type="submit" value="Create" name="soumettre">
             </form>
         {% endif %}
-        <table style="width:100%">
+        <table>
           <tr>
-            <th style="">Deck Name</th>
+              <th>Deck Name</th>
+              <th>Number of cards</th>
+              <th>Price</th>
           </tr>
             {% for item in userDeckList %}
-            <tr class="deck">
-               <th>{{item[0]}}</th>
+            <tr >
+               <th>
+                   <form action="/../decks/{{item[1]}}">
+                       <input type="submit" value="{{item[0]}}">
+                   </form>
+               </th>
+                <th>0</th>
+                <th>0$</th>
             </tr>
             {% endfor %}
         </table>
