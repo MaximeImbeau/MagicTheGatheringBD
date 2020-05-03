@@ -6,7 +6,7 @@ import hashlib
 app = Flask(__name__)
 ProfileUtilisateur = {}
 
-motDePasseDeLaDB = "mtgserver"
+motDePasseDeLaDB = "root"
 
 #For catalog
 card_names = []
@@ -143,6 +143,26 @@ def addSelectedCard():
     conn.close()
     return render_template('catalog.html', names=card_names, image_sources=image_sources, message="The card was added to your Selection")
 
+def get_following(connected_user):
+    conn = pymysql.connect(host='localhost', user='root', password='motDePasseDeLaDB', db='testdb')
+    cmd = 'SELECT COUNT(email_followed_user) FROM Suivre WHERE email_user =\'' + connected_user + '\';'
+    cur = conn.cursor()
+    cur.execute(cmd)
+    following_users_count = cur.fetchone()
+    print(following_users_count)
+
+def follow_user(connected_user, following_user):
+    print(connected_user)
+    print(following_user)
+    conn = pymysql.connect(host='localhost', user='root', password='motDePasseDeLaDB', db='testdb')
+    cmd = 'INSERT INTO Suivre(email_user, email_followed_user) VALUES(\'' + connected_user + '\', \'' + following_user + '\');'
+    cur = conn.cursor()
+    try:
+        cur.execute(cmd)
+    except pymysql.err.IntegrityError:
+        print('La personne est déjà suivi.')
+    conn.commit()
+    conn.close()
 
 if __name__ == "__main__":
     app.run()
