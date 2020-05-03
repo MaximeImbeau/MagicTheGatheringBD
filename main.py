@@ -6,7 +6,7 @@ import hashlib
 app = Flask(__name__)
 ProfileUtilisateur = {}
 
-motDePasseDeLaDB = "root"
+motDePasseDeLaDB = "mtgserver"
 
 #For catalog
 card_names = []
