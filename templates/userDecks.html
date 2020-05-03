@@ -1,0 +1,27 @@
+{% extends "navbar.html" %}
+{% block content %}
+<head>
+    <title>User Page</title>
+    <link rel="stylesheet" type="text/css" href="/../static/userDeck.css">
+</head>
+<body>
+        {% if ownership == True %}
+            <form action="/../user/{{ userMail }}/decks" method="post">
+                <p>
+                    New Deck name: <input type="text" name="deckName"><br>
+                </p><br>
+                <input type="submit" value="Create" name="soumettre">
+            </form>
+        {% endif %}
+        <table style="width:100%">
+          <tr>
+            <th style="">Deck Name</th>
+          </tr>
+            {% for item in userDeckList %}
+            <tr class="deck">
+               <th>{{item[0]}}</th>
+            </tr>
+            {% endfor %}
+        </table>
+</body>
+{% endblock %}

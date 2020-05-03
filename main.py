@@ -89,6 +89,23 @@ def renderDeckPage(userMail):
     return render_template('user.html', ownership=ownership, userMail=userMail)
 
 
+@app.route("/user/<userMail>/decks")
+def getUserDecks(userMail):
+    ownership = False
+    if "courriel" in ProfileUtilisateur.keys():
+        if ('"' + userMail + '"') == ProfileUtilisateur["courriel"]:
+            ownership = True
+
+    conn = pymysql.connect(host='localhost', user='root', password=motDePasseDeLaDB, db='testdb')
+    cmd = 'Select nom FROM Decks D INNER JOIN Deck_Owners D_O ON D.deckId = D_O.deckId WHERE owner_email = '+'"'+userMail+'";'
+    cur = conn.cursor()
+    cur.execute(cmd)
+
+    userDecks = cur.fetchall()
+
+    return render_template('userDecks.html', ownership=ownership, userMail=userMail, userDeckList=userDecks)
+
+
 @app.route("/user/<userMail>/decks", methods=['POST'])
 def createNewDeck(userMail):
     deckId = '"'+str(uuid.uuid4())+'"'
