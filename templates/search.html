@@ -1,0 +1,62 @@
+{% extends "navbar.html" %}
+{% block content %}
+    <head>
+        <title>Welcome to MagicShop!</title>
+        <link rel="stylesheet" type="text/css" href="../static/css/search.css">
+        <script type="text/javascript" src="../static/js/search.js"></script>
+    </head>
+
+    <body>
+        <form id="search-form" action="results" method="post">
+            <div id="search-section">
+            <h1> Search for a card </h1>
+            <div id="search-bar">
+                <input id="search-field" name="card-name" type="search" placeholder="Type a card name here...">
+                <input id="rarity" name="rarity" type="hidden" value="">
+                <input id="type" name="type" type="hidden" value="">
+                <button type="submit"> Find </button>
+            </div>
+            <div id="advanced-checkbox"> Advanced Search
+                <input type="checkbox" id="advanced-params-checkbox" onchange="toggleSearchParameters()" ></div>
+            </div>
+
+        </form>
+
+        <div id="advanced-params">
+            <div class="dropdown">
+                Card Rarity :
+                <select onchange="addRarityParameter(this)">
+                    <option value=""> Select...</option>
+                    <option>Common</option>
+                    <option>Uncommon</option>
+                    <option>Rare</option>
+                    <option>Mythic Rare</option>
+                </select>
+            </div>
+            <div class="dropdown">
+                Card Type :
+                <select onchange="addTypeParameter(this)">
+                    <option value=""> Select...</option>
+                    <option>Creature</option>
+                    <option>Land</option>
+                    <option>Enchantment</option>
+                    <option>Sorcery</option>
+                    <option>Instant</option>
+                    <option>Artifact</option>
+                    <option>Planeswalker</option>
+                </select>
+            </div>
+            <div class="color-choice">
+                Card Color(s) :
+                <div> <input type="checkbox" class="color-checkbox" onchange="toggleColorlessCheckbox(); addColorParameter('black')">Black</div>
+                <div> <input type="checkbox" class="color-checkbox" onchange="toggleColorlessCheckbox(); addColorParameter('blue')"> Blue</div>
+                <div> <input type="checkbox" class="color-checkbox" onchange="toggleColorlessCheckbox(); addColorParameter('green')"> Green</div>
+                <div> <input type="checkbox" class="color-checkbox" onchange="toggleColorlessCheckbox(); addColorParameter('red')"> Red</div>
+                <div> <input type="checkbox" class="color-checkbox" onchange="toggleColorlessCheckbox(); addColorParameter('white')"> White</div>
+                <div class="colorless-checkbox">
+                    <input type="checkbox" id="colorless-checkbox" onchange="toggleColorCheckboxes()"> Colorless
+                </div>
+            </div>
+        </div>
+    </body>
+{% endblock %}
