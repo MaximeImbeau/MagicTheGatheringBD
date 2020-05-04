@@ -161,6 +161,11 @@ def results():
 
             if card_type != '""':
                 cmd = cmd + 'AND type={} '.format(card_type)
+
+                if len(colors) > 1:
+                    cmd = cmd + 'AND color IN {}'.format(colors) + ';'
+                if len(colors) == 1:
+                    cmd = cmd + 'AND color={}'.format('"' + colors[0] + '"') + ';'
             else:
                 if len(colors) > 1:
                     cmd = cmd + 'AND color IN {}'.format(colors) + ';'
@@ -169,6 +174,11 @@ def results():
         else:
             if card_type != '""':
                 cmd = cmd + 'AND type={}'.format(card_type)
+
+                if len(colors) > 1:
+                    cmd = cmd + 'AND color IN {}'.format(colors) + ';'
+                if len(colors) == 1:
+                    cmd = cmd + 'AND color={}'.format('"' + colors[0] + '"') + ';'
             else:
                 if len(colors) > 1:
                     cmd = cmd + 'AND color IN {}'.format(colors) + ';'
@@ -181,6 +191,11 @@ def results():
 
             if card_type != '""':
                 cmd = cmd + 'AND type={} '.format(card_type)
+
+                if len(colors) > 1:
+                    cmd = cmd + 'AND color IN {}'.format(colors) + ';'
+                if len(colors) == 1:
+                    cmd = cmd + 'AND color={}'.format('"' + colors[0] + '"') + ';'
             else:
                 if len(colors) > 1:
                     cmd = cmd + 'AND color IN {}'.format(colors) + ';'
@@ -189,6 +204,11 @@ def results():
         else:
             if card_type != '""':
                 cmd = cmd + ' WHERE type={}'.format(card_type)
+
+                if len(colors) > 1:
+                    cmd = cmd + 'AND color IN {}'.format(colors) + ';'
+                if len(colors) == 1:
+                    cmd = cmd + 'AND color={}'.format('"' + colors[0] + '"') + ';'
             else:
                 if len(colors) > 1:
                     cmd = cmd + ' WHERE color IN {}'.format(colors) + ';'
