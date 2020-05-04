@@ -16,3 +16,7 @@ table, th, td {
     border: none;
     with: auto;
 }
+
+.sameLine {
+    float: left;
+}

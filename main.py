@@ -143,7 +143,7 @@ def getUserDecks(userMail):
             ownership = True
 
     conn = pymysql.connect(host='localhost', user='root', password=motDePasseDeLaDB, db='testdb')
-    cmd = 'Select nom, D.deckId FROM Decks D INNER JOIN Deck_Owners D_O ON D.deckId = D_O.deckId WHERE owner_email = '+'"'+userMail+'"'+ "ORDER BY nom ;"
+    cmd = 'Select deckName, D.deckId, D.numberOfCards, D.deckPrice FROM Decks D INNER JOIN Deck_Owners D_O ON D.deckId = D_O.deckId WHERE owner_email = '+'"'+userMail+'"'+ "ORDER BY deckName ;"
     cur = conn.cursor()
     cur.execute(cmd)
 
@@ -159,7 +159,7 @@ def createNewDeck(userMail):
 
     ownerMail = '"'+userMail+'"'
 
-    insertDeckCmd = "INSERT INTO Decks VALUES ("+deckId+','+deckName+');'
+    insertDeckCmd = "INSERT INTO Decks (deckId, deckName) VALUES ("+deckId+','+deckName+');'
     insertDeckOwnerShipCmd = "INSERT INTO Deck_Owners VALUES ("+deckId+','+ownerMail+');'
 
     conn = pymysql.connect(host='localhost', user='root', password=motDePasseDeLaDB, db='testdb')
@@ -326,14 +326,35 @@ def followUser(connected_user, following_user):
 
 @app.route("/card_details/<card>", methods=['POST'])
 def card_details(card):
-    card_image = request.form.get('card-image')
-    card_name = request.form.get('name')
-    mana_cost = request.form.get('mana-cost')
-    rarity = request.form.get('rarity')
-    card_type = request.form.get('type')
 
-    return render_template('cardDetails.html', cardDetails=[card, mana_cost, rarity, card_type, card_image])
+    conn = pymysql.connect(host='localhost', user='root', password=motDePasseDeLaDB, db='testdb')
+    cmd = "SELECT * FROM cards WHERE name = '" + card + "';"
+    cur = conn.cursor()
+    cur.execute(cmd)
 
+    cardInfo = cur.fetchone()
+    conn.close()
+
+    userConnected = False
+    if "courriel" in ProfileUtilisateur.keys() and ProfileUtilisateur["courriel"] != None:
+        userConnected = True
+
+    return render_template('cardDetails.html', cardDetails=cardInfo, userConnected=userConnected)
+
+
+@app.route("/card_selection", methods=['POST'])
+def addCard():
+    cardName = request.form.get('cardName')
+    selectedCards.append(cardName)
+    return render_template('selection.html', selectedCards=selectedCards)
+
+
+@app.route("/card_selection", methods=['GET', 'DELETE'])
+def removeCard():
+    cardName = request.form.get('cardName')
+    print(cardName)
+    selectedCards.remove(cardName)
+    return render_template('selection.html', selectedCards=selectedCards)
 
 if __name__ == "__main__":
     app.run()

@@ -8,13 +8,19 @@
     <body>
         <div id="card">
             <img src={{cardDetails[4]}}>
-            <div id="cardDetails">
-                <p> Card name : {{cardDetails[0]}}</p>
-                <p> Total mana cost : {{cardDetails[1]}}</p>
-                <p> Rarity : {{cardDetails[2]}}</p>
-                <p> Type : {{cardDetails[3]}}</p>
-                <p> Price : 420$</p>
-            </div>
+            <form action="/../card_selection" method="post">
+                <div id="cardDetails">
+                    <p> Card name : {{cardDetails[0]}}</p>
+                    <p> Total mana cost : {{cardDetails[1]}}</p>
+                    <p> Rarity : {{cardDetails[2]}}</p>
+                    <p> Type : {{cardDetails[3]}}</p>
+                    <p> Price : 420$</p>
+                    <input name="cardName" type="hidden" value="{{cardDetails[0]}}">
+                    {% if userConnected %}
+                    <input type="submit" value="Add to Selection">
+                    {% endif %}
+                </div>
+            </form>
         </div>
     </body>
 {% endblock %}

@@ -155,7 +155,7 @@ INSERT INTO card_colors VALUES ('Air Elemental', 'blue'), ('Ifnir Deadlands', 'b
 ('Ancient Excavation', 'white');
 
 
-CREATE TABLE IF NOT EXISTS Decks(deckId varchar(64), nom varchar(50), PRIMARY KEY (deckId));
+CREATE TABLE IF NOT EXISTS Decks(deckId varchar(64), deckName varchar(50), numberOfCards int(3) DEFAULT 0, deckPrice float(4, 2) DEFAULT 0.00 , PRIMARY KEY (deckId));
 
 CREATE TABLE IF NOT EXISTS Decks_content(deckId varchar(64), card_name varchar(50), card_quantity Int(1), FOREIGN KEY (deckId) REFERENCES Decks(deckId), FOREIGN KEY (card_name) REFERENCES Cards(name), PRIMARY KEY (deckId, card_name));
 
