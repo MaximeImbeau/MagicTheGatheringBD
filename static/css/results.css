@@ -1,0 +1,30 @@
+h2 {
+    color: white;
+    margin-left: 15%;
+}
+
+.card {
+    display: inline-block;
+    width: 430px;
+    height: 599px;
+    margin-bottom: 5px;
+}
+
+#image_input {
+    width: 75%;
+    border: 3px solid white;
+    border-radius: 5px;
+}
+
+#results {
+    text-align: center;
+}
+
+#no-results {
+    color: white;
+    margin-left: 15%;
+}
+
+form {
+    display: inline-block;
+}

@@ -2,7 +2,7 @@
 {% block content %}
     <head>
     <title>Welcome to MagicShop!</title>
-    <link rel="stylesheet" type="text/css" href="../static/catalog.css">
+    <link rel="stylesheet" type="text/css" href="../static/css/catalog.css">
     </head>
 
     <body>
@@ -19,8 +19,17 @@
             </div>
         </form>
         <div class="card-list">
-            {% for item in image_sources %}
-            <div class="card"> <img src={{item}}> </div>
+            {% for item in card_info %}
+            <form action="card_details/{{item[0]}}" method="post">
+                <div class="card">
+                    <input id="image_input" type="image" src={{item[4]}} alt="">
+                    <input name="name" type="hidden" value="{{item[0]}}">
+                    <input name="mana-cost" type="hidden" value="{{item[1]}}">
+                    <input name="rarity" type="hidden" value="{{item[2]}}">
+                    <input name="type" type="hidden" value="{{item[3]}}">
+                    <input name="card-image" type="hidden" value="{{item[4]}}">
+                </div>
+            </form>
             {% endfor %}
         </div>
     </body>
