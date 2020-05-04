@@ -14,6 +14,9 @@ image_sources = []
 
 selectedCards = []
 
+#For user
+followingCount = 0
+
 
 @app.route("/")
 def main():
@@ -44,7 +47,10 @@ def login():
         global ProfileUtilisateur
         ProfileUtilisateur["courriel"] = courriel
         ProfileUtilisateur["nom"] = info[2]
-        return render_template('user.html', ownership=True, userMail=request.form.get('courriel'))
+        nom = getName(courriel)
+        balance = getBalance(courriel)
+        followerCount = getFollowing(courriel)
+        return render_template('user.html', ownership=True, userMail=request.form.get('courriel'), nom=nom, balance=balance, followerCount=followerCount)
 
     return render_template('login.html', message="Informations invalides!")
 
@@ -84,10 +90,50 @@ def signup():
 @app.route("/user/<userMail>")
 def renderDeckPage(userMail):
     ownership = False
-    if ('"' + userMail + '"') == ProfileUtilisateur["courriel"]:
-        ownership = True
+    if "courriel" in ProfileUtilisateur.keys():
+        if ('"' + userMail + '"') == ProfileUtilisateur["courriel"]:
+            ownership = True
     return render_template('user.html', ownership=ownership, userMail=userMail)
 
+@app.route("/user")
+def createUserPage():
+    userConnected = False
+    userMail = None
+    nom = None
+    balance = None
+    followerCount = None
+    if "courriel" in ProfileUtilisateur.keys() and ProfileUtilisateur["courriel"] != None:
+        userConnected = True
+        userMail = ProfileUtilisateur["courriel"]
+        nom = getName(userMail)
+        balance = getBalance(userMail)
+        followerCount = getFollowing(userMail)
+    return render_template('user.html', ownership=True, userMail=userMail, nom=nom, balance=balance, followerCount=followerCount, userConnected=userConnected)
+
+@app.route("/user", methods=['POST'])
+def follow():
+    searchedUser = request.form.get('searchedUser')
+    ownership = False
+    userMail = None
+    nom = None
+    balance = None
+    followerCount = None
+    message = None
+    if "courriel" in ProfileUtilisateur.keys() and ProfileUtilisateur["courriel"] != None:
+        ownership = True
+        userMail = ProfileUtilisateur["courriel"]
+        nom = getName(userMail)
+        balance = getBalance(userMail)
+        followerCount = getFollowing(userMail)
+
+    result = followUser(userMail, searchedUser)
+
+    if result:
+        message = "Utilisateur suivi avec succès!"
+    else:
+        message = "Utilisateur est déjà suivi ou n'existe pas."
+
+    return render_template('user.html', message=message, ownership=ownership, userMail=userMail, nom=nom, balance=balance, followerCount=followerCount)
 
 @app.route("/user/<userMail>/decks")
 def getUserDecks(userMail):
@@ -123,10 +169,11 @@ def createNewDeck(userMail):
     conn.commit()
     conn.close()
 
-    return render_template('user.html', ownership=True, userMail=userMail)
+    return getUserDecks(userMail)
 
 @app.route("/catalog")
 def get_cards():
+    print('/catalog')
     global card_names
     global image_sources
 
@@ -160,37 +207,6 @@ def addSelectedCard():
     conn.close()
     return render_template('catalog.html', names=card_names, image_sources=image_sources, message="The card was added to your Selection")
 
-def get_following(connected_user):
-    conn = pymysql.connect(host='localhost', user='root', password='motDePasseDeLaDB', db='testdb')
-    cmd = 'SELECT COUNT(email_followed_user) FROM Suivre WHERE email_user =\'' + connected_user + '\';'
-    cur = conn.cursor()
-    cur.execute(cmd)
-    following_users_count = cur.fetchone()
-    print(following_users_count)
-
-def follow_user(connected_user, following_user):
-    print(connected_user)
-    print(following_user)
-    conn = pymysql.connect(host='localhost', user='root', password='motDePasseDeLaDB', db='testdb')
-    cmd = 'INSERT INTO Suivre(email_user, email_followed_user) VALUES(\'' + connected_user + '\', \'' + following_user + '\');'
-    cur = conn.cursor()
-    try:
-        cur.execute(cmd)
-    except pymysql.err.IntegrityError:
-        print('La personne est déjà suivi.')
-    conn.commit()
-    conn.close()
-
-@app.route("/card_details/<card>", methods=['POST'])
-def card_details(card):
-    card_image = request.form.get('card-image')
-    card_name = request.form.get('name')
-    mana_cost = request.form.get('mana-cost')
-    rarity = request.form.get('rarity')
-    card_type = request.form.get('type')
-
-    return render_template('cardDetails.html', cardDetails=[card, mana_cost, rarity, card_type, card_image])
-
 
 @app.route("/search", methods=['GET', 'POST'])
 def search():
@@ -211,7 +227,7 @@ def results():
     name_query = '"' + '%{}%'.format(name) + '"'
     colors = tuple(colors)
 
-    conn = pymysql.connect(host='localhost', user='root', password='kroot', db='testdb')
+    conn = pymysql.connect(host='localhost', user='root', password=motDePasseDeLaDB, db='testdb')
     cmd = 'SELECT * FROM cards NATURAL JOIN card_colors'
 
     if name_query != '"%%"':
@@ -270,6 +286,53 @@ def results():
             image_sources.append(d[4])
 
     return render_template('results.html', card_info=list(data), image_sources=image_sources)
+
+def getFollowing(connected_user):
+    conn = pymysql.connect(host='localhost', user='root', password=motDePasseDeLaDB, db='testdb')
+    cmd = 'SELECT COUNT(email_followed_user) FROM Suivre WHERE email_user =' + connected_user + ';'
+    cur = conn.cursor()
+    cur.execute(cmd)
+    return cur.fetchone()[0]
+
+def getName(connected_user):
+    conn = pymysql.connect(host='localhost', user='root', password=motDePasseDeLaDB, db='testdb')
+    cmd = 'SELECT nom FROM Utilisateur WHERE courriel = ' + connected_user + ';'
+    cur = conn.cursor()
+    cur.execute(cmd)
+    return cur.fetchone()[0]
+
+def getBalance(connected_user):
+    conn = pymysql.connect(host='localhost', user='root', password=motDePasseDeLaDB, db='testdb')
+    cmd = 'SELECT balance FROM Utilisateur WHERE courriel = ' + connected_user + ';'
+    cur = conn.cursor()
+    cur.execute(cmd)
+    return cur.fetchone()[0]
+
+def followUser(connected_user, following_user):
+    print(connected_user, following_user)
+    conn = pymysql.connect(host='localhost', user='root', password=motDePasseDeLaDB, db='testdb')
+    cmd = 'INSERT INTO Suivre(email_user, email_followed_user) VALUES(' + connected_user + ',\'' + following_user + '\');'
+    cur = conn.cursor()
+    try:
+        cur.execute(cmd)
+        conn.commit()
+        conn.close()
+        return True
+    except pymysql.err.IntegrityError:
+        conn.commit()
+        conn.close()
+        return False
+
+
+@app.route("/card_details/<card>", methods=['POST'])
+def card_details(card):
+    card_image = request.form.get('card-image')
+    card_name = request.form.get('name')
+    mana_cost = request.form.get('mana-cost')
+    rarity = request.form.get('rarity')
+    card_type = request.form.get('type')
+
+    return render_template('cardDetails.html', cardDetails=[card, mana_cost, rarity, card_type, card_image])
 
 
 if __name__ == "__main__":

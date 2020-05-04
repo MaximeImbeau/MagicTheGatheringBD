@@ -2,15 +2,15 @@
 {% block content %}
 <head>
     <title>User Page</title>
-    <link rel="stylesheet" type="text/css" href="/../static/userDeck.css?v=1.7">
+    <link rel="stylesheet" type="text/css" href="/../static/userDeck.css?v=1.9">
 </head>
 <body>
         {% if ownership == True %}
             <form action="/../user/{{ userMail }}/decks" method="post">
                 <p>
-                    New Deck name: <input type="text" name="deckName"><br>
-                </p><br>
-                <input type="submit" value="Create" name="soumettre">
+                    New Deck name: <input type="text" name="deckName">
+                    <input type="submit" value="Create" name="soumettre">
+                </p>
             </form>
         {% endif %}
         <table>
@@ -23,7 +23,7 @@
             <tr >
                <th>
                    <form action="/../decks/{{item[1]}}">
-                       <input type="submit" value="{{item[0]}}">
+                       <input class="deckName" type="submit" value="{{item[0]}}">
                    </form>
                </th>
                 <th>0</th>
