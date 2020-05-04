@@ -26,7 +26,7 @@ def login():
     hashTable.update(passe.encode('utf-8'))
 
 
-    conn= pymysql.connect(host='localhost',user='root', password='root',db='testdb')
+    conn= pymysql.connect(host='localhost',user='root', password='kroot',db='testdb')
     cmd='SELECT motpasse FROM Utilisateur WHERE courriel='+courriel+';'
     cur=conn.cursor()
 
@@ -67,7 +67,7 @@ def signup():
 
     nom = "'" + request.form.get('nom') + "'"
 
-    conn = pymysql.connect(host='localhost', user='root', password='mtgserver', db='testdb')
+    conn = pymysql.connect(host='localhost', user='root', password='kroot', db='testdb')
     cmd = 'INSERT INTO Utilisateur(courriel, motpasse, nom) VALUES('+courriel+','+ "'" + hashTable.hexdigest() + "'" +','+nom+');'
     cur = conn.cursor()
     try:
@@ -92,7 +92,7 @@ def get_cards():
     card_names = []
     image_sources = []
 
-    conn = pymysql.connect(host='localhost', user='root', password='mtgserver', db='testdb')
+    conn = pymysql.connect(host='localhost', user='root', password='kroot', db='testdb')
     cmd = 'SELECT * FROM cards' + ';'
     cur = conn.cursor()
     cur.execute(cmd)
@@ -103,14 +103,14 @@ def get_cards():
         card_names.append(d[0])
         image_sources.append(d[4])
 
-    return render_template('catalog.html', names=card_names, image_sources=image_sources)
+    return render_template('catalog.html', card_info=list(data), image_sources=image_sources)
 
 
 @app.route("/catalog", methods=['POST'])
 def addSelectedCard():
     cardName = request.form.get('cardName')
 
-    conn = pymysql.connect(host='localhost', user='root', password='mtgserver', db='testdb')
+    conn = pymysql.connect(host='localhost', user='root', password='kroot', db='testdb')
     cmd = 'SELECT * FROM Cards WHERE name=' + "'" + cardName + "'" + ";"
     cur = conn.cursor()
     if cur.execute(cmd) == 0:
@@ -118,6 +118,17 @@ def addSelectedCard():
     selectedCards.append(cardName)
     conn.close()
     return render_template('catalog.html', names=card_names, image_sources=image_sources, message="The card was added to your Selection")
+
+
+@app.route("/card_details/<card>", methods=['POST'])
+def card_details(card):
+    card_image = request.form.get('card-image')
+    card_name = request.form.get('name')
+    mana_cost = request.form.get('mana-cost')
+    rarity = request.form.get('rarity')
+    card_type = request.form.get('type')
+
+    return render_template('cardDetails.html', cardDetails=[card, mana_cost, rarity, card_type, card_image])
 
 
 @app.route("/search", methods=['GET', 'POST'])
