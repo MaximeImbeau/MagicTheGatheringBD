@@ -86,10 +86,8 @@ def renderDeckPage():
 
 @app.route("/catalog")
 def get_cards():
-    global card_names
     global image_sources
 
-    card_names = []
     image_sources = []
 
     conn = pymysql.connect(host='localhost', user='root', password='kroot', db='testdb')
@@ -100,7 +98,6 @@ def get_cards():
     data = cur.fetchall()
 
     for d in data:
-        card_names.append(d[0])
         image_sources.append(d[4])
 
     return render_template('catalog.html', card_info=list(data), image_sources=image_sources)
@@ -216,6 +213,7 @@ def results():
                     cmd = cmd + ' WHERE color={}'.format('"' + colors[0] + '"') + ';'
 
     cur = conn.cursor()
+    print(cmd)
     cur.execute(cmd)
 
     data = cur.fetchall()
@@ -223,12 +221,20 @@ def results():
     if len(data) == 0:
         return render_template('results.html', no_results='No results available.')
 
+    names = []
+    data = list(data)
+
     for d in data:
+
+        if d[0] in names:
+            data.remove(d)
+        else:
+            names.append(d[0])
 
         if d[4] not in image_sources:
             image_sources.append(d[4])
 
-    return render_template('results.html', card_info=list(data), image_sources=image_sources)
+    return render_template('results.html', card_info=data, image_sources=image_sources)
 
 
 if __name__ == "__main__":
