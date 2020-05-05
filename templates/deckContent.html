@@ -1,0 +1,47 @@
+{% extends "navbar.html" %}
+{% block content %}
+<head>
+    <title>Welcome to MagicShop!</title>
+    <link rel="stylesheet" type="text/css" href="/../static/userDeck.css?v=1.10">
+</head>
+<body>
+    <div>{{deckInfo[5]}}'s {{deckInfo[1]}}</div>
+    {%if ownership%}
+        <form action="/../decks/{{deckInfo[0]}}" method="post">
+            <input type="submit" value="Add Selection">
+        </form>
+    {% endif %}
+    <table>
+        <tr>
+            <th>Card Name</th>
+            <th>Card Quantity</th>
+        </tr>
+        {% for card in deckContent %}
+        <tr >
+            <th>
+                <div class="sameLine">
+                    <form action="/../card_details/{{deckContent[1]}}" method='post'>
+                        <input class="deckName" type="submit" value="{{card[1]}}">
+                    </form>
+                </div>
+                {%if ownership %}
+                <div class="sameLine">
+                    <form action="/../decks/{{deckInfo[0]}}/add" method="post">
+                        <input type="hidden" value="{{card[1]}}" name="cardName">
+                        <input type="submit" value="+">
+                    </form>
+                </div>
+                <div class="sameLine">
+                     <form action="/../decks/{{deckInfo[0]}}/remove" method="post">
+                         <input type="hidden" value="{{card[1]}}" name="cardName">
+                        <input type="submit" value="-">
+                    </form>
+                </div>
+                {% endif %}
+            </th>
+            <th>{{card[2]}}</th>
+        </tr>
+        {% endfor %}
+    </table>
+</body>
+{% endblock %}

@@ -18,14 +18,13 @@
                     </form>
                 </div>
                 <div class="sameLine">
-                    <form action="/card_selection" method="post">
+                    <form action="/../card_selection" method="post">
                         <input type="hidden" value="{{cardName}}" name="cardName">
                         <input type="submit" value="+">
                     </form>
                 </div>
                 <div class="sameLine">
-                     <form action="/card_selection" method="delete">
-                        <input type="hidden" value="{{cardName}}" name="cardName">
+                     <form action="/../card_selection/{{cardName}}" method="delete">
                         <input type="submit" value="-">
                     </form>
                 </div>

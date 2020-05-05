@@ -25,31 +25,31 @@ def main():
 
 @app.route("/login", methods=['POST'])
 def login():
-    courriel = '"' + request.form.get('courriel') + '"'
+    email= request.form.get('courriel')
     passe = request.form.get('motpasse')
     hashTable = hashlib.new('ripemd160')
     hashTable.update(passe.encode('utf-8'))
 
 
     conn= pymysql.connect(host='localhost',user='root', password=motDePasseDeLaDB ,db='testdb')
-    cmd='SELECT motpasse FROM Utilisateur WHERE courriel='+courriel+';'
+    cmd='SELECT motpasse FROM Utilisateur WHERE courriel= "'+email+'";'
     cur=conn.cursor()
 
     cur.execute(cmd)
     passeVrai = cur.fetchone()
 
     if (passeVrai != None) and (hashTable.hexdigest() == passeVrai[0]):
-        cmd = 'SELECT * FROM Utilisateur WHERE courriel=' + courriel + ';'
+        cmd = 'SELECT * FROM Utilisateur WHERE courriel= "' + email + '";'
         cur = conn.cursor()
         cur.execute(cmd)
         info = cur.fetchone()
 
         global ProfileUtilisateur
-        ProfileUtilisateur["courriel"] = courriel
+        ProfileUtilisateur["courriel"] = email
         ProfileUtilisateur["nom"] = info[2]
-        nom = getName(courriel)
-        balance = getBalance(courriel)
-        followerCount = getFollowing(courriel)
+        nom = getName(email)
+        balance = getBalance(email)
+        followerCount = getFollowing(email)
         return render_template('user.html', ownership=True, userMail=request.form.get('courriel'), nom=nom, balance=balance, followerCount=followerCount)
 
     return render_template('login.html', message="Informations invalides!")
@@ -91,7 +91,7 @@ def signup():
 def renderDeckPage(userMail):
     ownership = False
     if "courriel" in ProfileUtilisateur.keys():
-        if ('"' + userMail + '"') == ProfileUtilisateur["courriel"]:
+        if (userMail) == ProfileUtilisateur["courriel"]:
             ownership = True
     return render_template('user.html', ownership=ownership, userMail=userMail)
 
@@ -139,7 +139,7 @@ def follow():
 def getUserDecks(userMail):
     ownership = False
     if "courriel" in ProfileUtilisateur.keys():
-        if ('"' + userMail + '"') == ProfileUtilisateur["courriel"]:
+        if (userMail) == ProfileUtilisateur["courriel"]:
             ownership = True
 
     conn = pymysql.connect(host='localhost', user='root', password=motDePasseDeLaDB, db='testdb')
@@ -171,9 +171,139 @@ def createNewDeck(userMail):
 
     return getUserDecks(userMail)
 
+
+@app.route("/decks/<deckId>")
+def getDeck(deckId):
+    conn = pymysql.connect(host='localhost', user='root', password=motDePasseDeLaDB, db='testdb')
+    cmd = 'Select * FROM Decks D INNER JOIN Deck_Owners D_O ON D.deckId = D_O.deckId WHERE D.deckId = '+'"'+deckId+'"'+ ";"
+    cur = conn.cursor()
+    cur.execute(cmd)
+
+    deckInfo = cur.fetchone()
+
+    ownership = False
+    if "courriel" in ProfileUtilisateur.keys():
+        if (deckInfo[5]) == ProfileUtilisateur["courriel"]:
+            ownership = True
+
+    cmd2 = "SELECT * FROM Decks_content WHERE deckId = '"+deckId+"';"
+    cur.execute(cmd2)
+
+    deckContent = cur.fetchall();
+
+    conn.close()
+    return render_template('deckContent.html', deckInfo=deckInfo, deckContent=deckContent, ownership=ownership)
+
+
+@app.route("/decks/<deckId>", methods=['POST'])
+def addSelectedInDeck(deckId):
+    conn = pymysql.connect(host='localhost', user='root', password=motDePasseDeLaDB, db='testdb')
+    cmd = 'Select * FROM Decks D INNER JOIN Deck_Owners D_O ON D.deckId = D_O.deckId WHERE D.deckId = '+'"'+deckId+'"'+ ";"
+    cur = conn.cursor()
+    cur.execute(cmd)
+
+    deckInfo = cur.fetchone()
+
+    ownership = False
+    if "courriel" in ProfileUtilisateur.keys():
+        if (deckInfo[5]) == ProfileUtilisateur["courriel"]:
+            ownership = True
+
+        for card in selectedCards:
+            cardInDeckQuery = "SELECT * FROM Decks_content WHERE deckId = '" + deckId + "' AND "+"card_name = '"+card+"';"
+            cur.execute(cardInDeckQuery)
+            cardInDeck = cur.fetchone()
+
+            if cardInDeck == None:
+                cardInsertionQuery = "INSERT INTO Decks_content VALUES ('"+deckId+"', '"+card+"', "+'1'+");"
+                cur.execute(cardInsertionQuery)
+                conn.commit()
+            else:
+                newNumberOfCardInDeck = str(cardInDeck[2] + 1)
+                cardQuantityUpdate = "UPDATE Decks_content SET card_quantity = " + newNumberOfCardInDeck + " WHERE deckId = '" + deckId + "' AND "+"card_name = '"+card+"';"
+                cur.execute(cardQuantityUpdate)
+                conn.commit()
+
+    deckContentQuery = "SELECT * FROM Decks_content WHERE deckId = '"+deckId+"';"
+    cur.execute(deckContentQuery)
+    deckContent = cur.fetchall();
+
+    conn.close()
+    return render_template('deckContent.html', deckInfo=deckInfo, deckContent=deckContent, ownership=ownership)
+
+
+@app.route("/decks/<deckId>/add", methods=['POST'])
+def addCardToDeck(deckId):
+    conn = pymysql.connect(host='localhost', user='root', password=motDePasseDeLaDB, db='testdb')
+    cur = conn.cursor()
+
+    cmd = 'Select * FROM Decks D INNER JOIN Deck_Owners D_O ON D.deckId = D_O.deckId WHERE D.deckId = '+'"'+deckId+'"'+ ";"
+    cur.execute(cmd)
+    deckInfo = cur.fetchone()
+
+    ownership = False
+    if "courriel" in ProfileUtilisateur.keys():
+        if (deckInfo[5]) == ProfileUtilisateur["courriel"]:
+            ownership = True
+
+        card = request.form.get("cardName")
+
+        cardInDeckQuery = "SELECT * FROM Decks_content WHERE deckId = '" + deckId + "' AND " + "card_name = '" + card + "';"
+        cur.execute(cardInDeckQuery)
+        cardInDeck = cur.fetchone()
+
+        newNumberOfCardInDeck = str(cardInDeck[2] + 1)
+        cardQuantityUpdate = "UPDATE Decks_content SET card_quantity = " + newNumberOfCardInDeck + " WHERE deckId = '" + deckId + "' AND " + "card_name = '" + card + "';"
+        cur.execute(cardQuantityUpdate)
+        conn.commit()
+
+    deckContentQuery = "SELECT * FROM Decks_content WHERE deckId = '"+deckId+"';"
+    cur.execute(deckContentQuery)
+    deckContent = cur.fetchall();
+
+    conn.close()
+    return render_template('deckContent.html', deckInfo=deckInfo, deckContent=deckContent, ownership=ownership)
+
+
+@app.route("/decks/<deckId>/remove", methods=['POST'])
+def removeCardFromDeck(deckId):
+    conn = pymysql.connect(host='localhost', user='root', password=motDePasseDeLaDB, db='testdb')
+    cur = conn.cursor()
+
+    cmd = 'Select * FROM Decks D INNER JOIN Deck_Owners D_O ON D.deckId = D_O.deckId WHERE D.deckId = '+'"'+deckId+'"'+ ";"
+    cur.execute(cmd)
+    deckInfo = cur.fetchone()
+
+    ownership = False
+    if "courriel" in ProfileUtilisateur.keys():
+        if (deckInfo[5]) == ProfileUtilisateur["courriel"]:
+            ownership = True
+
+        card = request.form.get("cardName")
+
+        cardInDeckQuery = "SELECT * FROM Decks_content WHERE deckId = '" + deckId + "' AND " + "card_name = '" + card + "';"
+        cur.execute(cardInDeckQuery)
+        cardInDeck = cur.fetchone()
+
+        if 0 < cardInDeck[2] - 1:
+            newNumberOfCardInDeck = str(cardInDeck[2] - 1)
+            cardQuantityUpdate = "UPDATE Decks_content SET card_quantity = " + newNumberOfCardInDeck + " WHERE deckId = '" + deckId + "' AND " + "card_name = '" + card + "';"
+            cur.execute(cardQuantityUpdate)
+            conn.commit()
+        else:
+            removeCardFromDeckQuery = "DELETE FROM Decks_content WHERE deckId = '" + deckId + "' AND " + "card_name = '" + card + "';"
+            cur.execute(removeCardFromDeckQuery)
+            conn.commit()
+
+    deckContentQuery = "SELECT * FROM Decks_content WHERE deckId = '"+deckId+"';"
+    cur.execute(deckContentQuery)
+    deckContent = cur.fetchall();
+
+    conn.close()
+    return render_template('deckContent.html', deckInfo=deckInfo, deckContent=deckContent, ownership=ownership)
+
 @app.route("/catalog")
 def get_cards():
-    print('/catalog')
     global card_names
     global image_sources
 
@@ -289,29 +419,28 @@ def results():
 
 def getFollowing(connected_user):
     conn = pymysql.connect(host='localhost', user='root', password=motDePasseDeLaDB, db='testdb')
-    cmd = 'SELECT COUNT(email_followed_user) FROM Suivre WHERE email_user =' + connected_user + ';'
+    cmd = 'SELECT COUNT(email_followed_user) FROM Suivre WHERE email_user ="' + connected_user + '";'
     cur = conn.cursor()
     cur.execute(cmd)
     return cur.fetchone()[0]
 
 def getName(connected_user):
     conn = pymysql.connect(host='localhost', user='root', password=motDePasseDeLaDB, db='testdb')
-    cmd = 'SELECT nom FROM Utilisateur WHERE courriel = ' + connected_user + ';'
+    cmd = 'SELECT nom FROM Utilisateur WHERE courriel = "' + connected_user + '";'
     cur = conn.cursor()
     cur.execute(cmd)
     return cur.fetchone()[0]
 
 def getBalance(connected_user):
     conn = pymysql.connect(host='localhost', user='root', password=motDePasseDeLaDB, db='testdb')
-    cmd = 'SELECT balance FROM Utilisateur WHERE courriel = ' + connected_user + ';'
+    cmd = 'SELECT balance FROM Utilisateur WHERE courriel = "' + connected_user + '";'
     cur = conn.cursor()
     cur.execute(cmd)
     return cur.fetchone()[0]
 
 def followUser(connected_user, following_user):
-    print(connected_user, following_user)
     conn = pymysql.connect(host='localhost', user='root', password=motDePasseDeLaDB, db='testdb')
-    cmd = 'INSERT INTO Suivre(email_user, email_followed_user) VALUES(' + connected_user + ',\'' + following_user + '\');'
+    cmd = 'INSERT INTO Suivre(email_user, email_followed_user) VALUES("' + connected_user + '",\'' + following_user + '\');'
     cur = conn.cursor()
     try:
         cur.execute(cmd)
@@ -349,12 +478,16 @@ def addCard():
     return render_template('selection.html', selectedCards=selectedCards)
 
 
-@app.route("/card_selection", methods=['GET', 'DELETE'])
-def removeCard():
-    cardName = request.form.get('cardName')
-    print(cardName)
+@app.route("/card_selection/<cardName>", methods=['GET', 'DELETE'])
+def removeCard(cardName):
     selectedCards.remove(cardName)
     return render_template('selection.html', selectedCards=selectedCards)
+
+
+@app.route("/card_selection")
+def renderSelection():
+    return render_template('selection.html', selectedCards=selectedCards)
+
 
 if __name__ == "__main__":
     app.run()
