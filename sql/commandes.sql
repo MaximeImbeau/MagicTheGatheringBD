@@ -7,10 +7,6 @@ INSERT INTO Utilisateur(courriel, motpasse, nom) VALUES("edgeLord@mail.com", "pa
 CREATE TABLE IF NOT EXISTS Suivre(email_user varchar(50), email_followed_user varchar(50), FOREIGN KEY (email_user) REFERENCES Utilisateur(courriel), PRIMARY KEY (email_user, email_followed_user), FOREIGN KEY (email_followed_user) REFERENCES Utilisateur(courriel));
 INSERT INTO Suivre(email_user, email_followed_user) VALUES("edgeLord@mail.com", "maxime@mai.ca");
 
-CREATE TABLE IF NOT EXISTS Contenir(id varchar(50), quantity integer, FOREIGN KEY (id) REFERENCES cards(name));
-
-CREATE TABLE IF NOT EXISTS Catalog(id varchar(50), price integer, FOREIGN KEY (id) REFERENCES cards(name));
-
 CREATE TABLE IF NOT EXISTS cards(name varchar(50), manaCost integer, rarity varchar(15), type varchar(15), imageSource varchar(100), PRIMARY KEY (name));
 INSERT INTO cards VALUES ('Air Elemental', 3, 'uncommon', 'creature', 'https://img.scryfall.com/cards/large/front/f/9/f9de2b27-f7d1-4e2d-97b2-2bb236b6fb10.jpg?1562002439'),
 ('Ifnir Deadlands', 0, 'common', 'land', 'https://img.scryfall.com/cards/large/front/0/b/0b88728b-9b18-40c6-b634-f87f8da83665.jpg?1562788706'),
@@ -164,3 +160,33 @@ CREATE TABLE IF NOT EXISTS Decks(deckId varchar(64), deckName varchar(50), numbe
 CREATE TABLE IF NOT EXISTS Decks_content(deckId varchar(64), card_name varchar(50), card_quantity Int(1), FOREIGN KEY (deckId) REFERENCES Decks(deckId), FOREIGN KEY (card_name) REFERENCES Cards(name), PRIMARY KEY (deckId, card_name));
 
 CREATE TABLE IF NOT EXISTS Deck_Owners(deckId varchar(64), owner_email varchar(50), FOREIGN KEY (deckId) REFERENCES Decks(deckId), FOREIGN KEY (owner_email) REFERENCES Utilisateur(courriel));
+
+CREATE TABLE IF NOT EXISTS Contenir(cardName varchar(50), quantity integer, FOREIGN KEY (cardName) REFERENCES cards(name));
+
+CREATE TABLE IF NOT EXISTS Catalog(cardName varchar(50), price integer, FOREIGN KEY (cardName) REFERENCES cards(name));
+
+delimiter //
+CREATE TRIGGER addedCardInDeck AFTER INSERT ON Decks_content
+	FOR EACH ROW
+    BEGIN
+		UPDATE Decks SET numberOfCards= numberOfCards+1 WHERE deckId = NEW.deckId;
+	END;//
+delimiter ;
+
+delimiter //
+CREATE TRIGGER updateCardInDeck AFTER UPDATE ON Decks_content
+	FOR EACH ROW
+    BEGIN
+		IF NEW.card_quantity > OLD.card_quantity THEN
+		UPDATE Decks SET numberOfCards= numberOfCards+1 WHERE deckId = NEW.deckId;
+        ELSE
+        UPDATE Decks SET numberOfCards= numberOfCards-1 WHERE deckId = NEW.deckId;
+        END IF;
+	END;//
+delimiter ;
+
+delimiter //
+CREATE TRIGGER cardInDeckRemoved BEFORE DELETE ON Decks_content
+	FOR EACH ROW
+        UPDATE Decks SET numberOfCards= numberOfCards-1 WHERE deckId = DELETED.deckId;
+delimiter ;
