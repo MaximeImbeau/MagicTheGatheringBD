@@ -6,7 +6,7 @@ import hashlib
 app = Flask(__name__)
 ProfileUtilisateur = {}
 
-motDePasseDeLaDB = "mtgserver"
+motDePasseDeLaDB = "root"
 
 #For catalog
 card_names = []
@@ -98,17 +98,19 @@ def renderDeckPage(userMail):
 @app.route("/user")
 def createUserPage():
     userConnected = False
+    ownership = False
     userMail = None
     nom = None
     balance = None
     followerCount = None
     if "courriel" in ProfileUtilisateur.keys() and ProfileUtilisateur["courriel"] != None:
         userConnected = True
+        ownership = True
         userMail = ProfileUtilisateur["courriel"]
         nom = getName(userMail)
         balance = getBalance(userMail)
         followerCount = getFollowing(userMail)
-    return render_template('user.html', ownership=True, userMail=userMail, nom=nom, balance=balance, followerCount=followerCount, userConnected=userConnected)
+    return render_template('user.html', ownership=ownership, userMail=userMail, nom=nom, balance=balance, followerCount=followerCount, userConnected=userConnected)
 
 @app.route("/user", methods=['POST'])
 def follow():
@@ -309,7 +311,6 @@ def getBalance(connected_user):
     return cur.fetchone()[0]
 
 def followUser(connected_user, following_user):
-    print(connected_user, following_user)
     conn = pymysql.connect(host='localhost', user='root', password=motDePasseDeLaDB, db='testdb')
     cmd = 'INSERT INTO Suivre(email_user, email_followed_user) VALUES(' + connected_user + ',\'' + following_user + '\');'
     cur = conn.cursor()
