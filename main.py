@@ -30,9 +30,9 @@ def login():
     hashTable = hashlib.new('ripemd160')
     hashTable.update(passe.encode('utf-8'))
 
-
     conn= pymysql.connect(host='localhost',user='root', password=motDePasseDeLaDB ,db='testdb')
     cmd='SELECT motpasse FROM Utilisateur WHERE courriel= "'+email+'";'
+
     cur=conn.cursor()
 
     cur.execute(cmd)
@@ -74,6 +74,7 @@ def signup():
 
 
     nom = "'" + request.form.get('nom') + "'"
+
 
     conn = pymysql.connect(host='localhost', user='root', password=motDePasseDeLaDB, db='testdb')
     cmd = 'INSERT INTO Utilisateur(courriel, motpasse, nom) VALUES('+courriel+','+ "'" + hashTable.hexdigest() + "'" +','+nom+');'
@@ -306,10 +307,8 @@ def removeCardFromDeck(deckId):
 
 @app.route("/catalog")
 def get_cards():
-    global card_names
     global image_sources
 
-    card_names = []
     image_sources = []
 
     conn = pymysql.connect(host='localhost', user='root', password=motDePasseDeLaDB, db='testdb')
@@ -320,7 +319,6 @@ def get_cards():
     data = cur.fetchall()
 
     for d in data:
-        card_names.append(d[0])
         image_sources.append(d[4])
 
     return render_template('catalog.html', card_info=list(data), image_sources=image_sources)
@@ -339,6 +337,35 @@ def addSelectedCard():
     conn.close()
     return render_template('catalog.html', names=card_names, image_sources=image_sources, message="The card was added to your Selection")
 
+
+@app.route("/card_details/<card>", methods=['POST'])
+def card_details(card):
+    card_image = request.form.get('card-image')
+    card_name = request.form.get('name')
+    mana_cost = request.form.get('mana-cost')
+    rarity = request.form.get('rarity')
+    card_type = request.form.get('type')
+    card_price = getCardPrice(card_name)
+    card_instock = getCardInstock(card_name)
+
+
+    return render_template('cardDetails.html', cardDetails=[card, mana_cost, rarity, card_type, card_image, card_price, card_instock])
+
+def getCardPrice(cardName):
+    conn = pymysql.connect(host='localhost', user='root', password='root', db='testdb')
+    cmd = 'SELECT * FROM Catalog WHERE name=' + "'" + cardName + "'" + ";"
+    cur = conn.cursor()
+    cur.execute(cmd)
+
+    return cur.fetchall()
+
+def getCardInstock(cardName):
+    conn = pymysql.connect(host='localhost', user='root', password='root', db='testdb')
+    cmd = 'SELECT * FROM Contenir WHERE name=' + "'" + cardName + "'" + ";"
+    cur = conn.cursor()
+    cur.execute(cmd)
+
+    return cur.fetchall()
 
 @app.route("/search", methods=['GET', 'POST'])
 def search():
@@ -370,6 +397,11 @@ def results():
 
             if card_type != '""':
                 cmd = cmd + 'AND type={} '.format(card_type)
+
+                if len(colors) > 1:
+                    cmd = cmd + 'AND color IN {}'.format(colors) + ';'
+                if len(colors) == 1:
+                    cmd = cmd + 'AND color={}'.format('"' + colors[0] + '"') + ';'
             else:
                 if len(colors) > 1:
                     cmd = cmd + 'AND color IN {}'.format(colors) + ';'
@@ -378,6 +410,11 @@ def results():
         else:
             if card_type != '""':
                 cmd = cmd + 'AND type={}'.format(card_type)
+
+                if len(colors) > 1:
+                    cmd = cmd + 'AND color IN {}'.format(colors) + ';'
+                if len(colors) == 1:
+                    cmd = cmd + 'AND color={}'.format('"' + colors[0] + '"') + ';'
             else:
                 if len(colors) > 1:
                     cmd = cmd + 'AND color IN {}'.format(colors) + ';'
@@ -390,6 +427,11 @@ def results():
 
             if card_type != '""':
                 cmd = cmd + 'AND type={} '.format(card_type)
+
+                if len(colors) > 1:
+                    cmd = cmd + 'AND color IN {}'.format(colors) + ';'
+                if len(colors) == 1:
+                    cmd = cmd + 'AND color={}'.format('"' + colors[0] + '"') + ';'
             else:
                 if len(colors) > 1:
                     cmd = cmd + 'AND color IN {}'.format(colors) + ';'
@@ -398,6 +440,11 @@ def results():
         else:
             if card_type != '""':
                 cmd = cmd + ' WHERE type={}'.format(card_type)
+
+                if len(colors) > 1:
+                    cmd = cmd + 'AND color IN {}'.format(colors) + ';'
+                if len(colors) == 1:
+                    cmd = cmd + 'AND color={}'.format('"' + colors[0] + '"') + ';'
             else:
                 if len(colors) > 1:
                     cmd = cmd + ' WHERE color IN {}'.format(colors) + ';'
@@ -405,6 +452,7 @@ def results():
                     cmd = cmd + ' WHERE color={}'.format('"' + colors[0] + '"') + ';'
 
     cur = conn.cursor()
+    print(cmd)
     cur.execute(cmd)
 
     data = cur.fetchall()
@@ -412,12 +460,20 @@ def results():
     if len(data) == 0:
         return render_template('results.html', no_results='No results available.')
 
+    names = []
+    data = list(data)
+
     for d in data:
+
+        if d[0] in names:
+            data.remove(d)
+        else:
+            names.append(d[0])
 
         if d[4] not in image_sources:
             image_sources.append(d[4])
 
-    return render_template('results.html', card_info=list(data), image_sources=image_sources)
+    return render_template('results.html', card_info=data, image_sources=image_sources)
 
 def getFollowing(connected_user):
     conn = pymysql.connect(host='localhost', user='root', password=motDePasseDeLaDB, db='testdb')
