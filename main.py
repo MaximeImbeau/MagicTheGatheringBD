@@ -26,7 +26,7 @@ def login():
     hashTable.update(passe.encode('utf-8'))
 
 
-    conn= pymysql.connect(host='localhost',user='root', password='kroot',db='testdb')
+    conn= pymysql.connect(host='localhost',user='root', password='root',db='testdb')
     cmd='SELECT motpasse FROM Utilisateur WHERE courriel='+courriel+';'
     cur=conn.cursor()
 
@@ -67,7 +67,7 @@ def signup():
 
     nom = "'" + request.form.get('nom') + "'"
 
-    conn = pymysql.connect(host='localhost', user='root', password='kroot', db='testdb')
+    conn = pymysql.connect(host='localhost', user='root', password='root', db='testdb')
     cmd = 'INSERT INTO Utilisateur(courriel, motpasse, nom) VALUES('+courriel+','+ "'" + hashTable.hexdigest() + "'" +','+nom+');'
     cur = conn.cursor()
     try:
@@ -90,7 +90,7 @@ def get_cards():
 
     image_sources = []
 
-    conn = pymysql.connect(host='localhost', user='root', password='kroot', db='testdb')
+    conn = pymysql.connect(host='localhost', user='root', password='root', db='testdb')
     cmd = 'SELECT * FROM cards' + ';'
     cur = conn.cursor()
     cur.execute(cmd)
@@ -124,9 +124,27 @@ def card_details(card):
     mana_cost = request.form.get('mana-cost')
     rarity = request.form.get('rarity')
     card_type = request.form.get('type')
+    card_price = getCardPrice(card_name)
+    card_instock = getCardInstock(card_name)
 
-    return render_template('cardDetails.html', cardDetails=[card, mana_cost, rarity, card_type, card_image])
 
+    return render_template('cardDetails.html', cardDetails=[card, mana_cost, rarity, card_type, card_image, card_price, card_instock])
+
+def getCardPrice(cardName):
+    conn = pymysql.connect(host='localhost', user='root', password='root', db='testdb')
+    cmd = 'SELECT * FROM Catalog WHERE name=' + "'" + cardName + "'" + ";"
+    cur = conn.cursor()
+    cur.execute(cmd)
+
+    return cur.fetchall()
+
+def getCardInstock(cardName):
+    conn = pymysql.connect(host='localhost', user='root', password='root', db='testdb')
+    cmd = 'SELECT * FROM Contenir WHERE name=' + "'" + cardName + "'" + ";"
+    cur = conn.cursor()
+    cur.execute(cmd)
+
+    return cur.fetchall()
 
 @app.route("/search", methods=['GET', 'POST'])
 def search():
@@ -147,7 +165,7 @@ def results():
     name_query = '"' + '%{}%'.format(name) + '"'
     colors = tuple(colors)
 
-    conn = pymysql.connect(host='localhost', user='root', password='kroot', db='testdb')
+    conn = pymysql.connect(host='localhost', user='root', password='root', db='testdb')
     cmd = 'SELECT * FROM cards NATURAL JOIN card_colors'
 
     if name_query != '"%%"':
