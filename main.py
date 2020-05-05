@@ -6,7 +6,7 @@ import hashlib
 app = Flask(__name__)
 ProfileUtilisateur = {}
 
-motDePasseDeLaDB = "mtgserver"
+motDePasseDeLaDB = "root"
 
 #For catalog
 card_names = []
@@ -98,17 +98,19 @@ def renderDeckPage(userMail):
 @app.route("/user")
 def createUserPage():
     userConnected = False
+    ownership = False
     userMail = None
     nom = None
     balance = None
     followerCount = None
     if "courriel" in ProfileUtilisateur.keys() and ProfileUtilisateur["courriel"] != None:
         userConnected = True
+        ownership = True
         userMail = ProfileUtilisateur["courriel"]
         nom = getName(userMail)
         balance = getBalance(userMail)
         followerCount = getFollowing(userMail)
-    return render_template('user.html', ownership=True, userMail=userMail, nom=nom, balance=balance, followerCount=followerCount, userConnected=userConnected)
+    return render_template('user.html', ownership=ownership, userMail=userMail, nom=nom, balance=balance, followerCount=followerCount, userConnected=userConnected)
 
 @app.route("/user", methods=['POST'])
 def follow():
