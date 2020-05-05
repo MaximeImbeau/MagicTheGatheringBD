@@ -51,8 +51,6 @@ function addColorParameter(color) {
     let form = document.getElementById("search-form");
 
     addElementToForm(form, 'color', color);
-
-    console.log(document.getElementsByClassName('color-inputs'));
 }
 
 function addElementToForm(form, name, value) {
