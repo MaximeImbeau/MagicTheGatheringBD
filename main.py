@@ -305,6 +305,28 @@ def removeCardFromDeck(deckId):
     conn.close()
     return render_template('deckContent.html', deckInfo=deckInfo, deckContent=deckContent, ownership=ownership)
 
+@app.route("/decks/<deckId>/delete")
+def deleteDeck(deckId):
+    conn = pymysql.connect(host='localhost', user='root', password=motDePasseDeLaDB, db='testdb')
+    cmd = 'Select * FROM Decks D INNER JOIN Deck_Owners D_O ON D.deckId = D_O.deckId WHERE D.deckId = '+'"'+deckId+'"'+ ";"
+    cur = conn.cursor()
+    cur.execute(cmd)
+
+    deckInfo = cur.fetchone()
+
+    if "courriel" in ProfileUtilisateur.keys():
+        if (deckInfo[5]) == ProfileUtilisateur["courriel"]:
+            cmd1 = "DELETE FROM Decks_content WHERE deckId = '"+deckId+"';"
+            cmd2 = "DELETE FROM Deck_Owners WHERE deckId = '"+deckId+"';"
+            cmd3 = "DELETE FROM Decks WHERE deckId = '"+deckId+"';"
+            cur.execute(cmd1)
+            cur.execute(cmd2)
+            cur.execute(cmd3)
+
+    conn.commit()
+    conn.close()
+    return getUserDecks(deckInfo[5])
+
 @app.route("/catalog")
 def get_cards():
     global image_sources
@@ -337,16 +359,6 @@ def addSelectedCard():
     conn.close()
     return render_template('catalog.html', names=card_names, image_sources=image_sources, message="The card was added to your Selection")
 
-
-@app.route("/card_details/<card>", methods=['POST'])
-def card_details(card):
-    card_image = request.form.get('card-image')
-    card_name = request.form.get('name')
-    mana_cost = request.form.get('mana-cost')
-    rarity = request.form.get('rarity')
-    card_type = request.form.get('type')
-    card_price = getCardPrice(card_name)
-    card_instock = getCardInstock(card_name)
 
 
     return render_template('cardDetails.html', cardDetails=[card, mana_cost, rarity, card_type, card_image, card_price, card_instock])
