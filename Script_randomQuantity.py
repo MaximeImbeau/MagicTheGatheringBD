@@ -12,9 +12,8 @@ names = cur.fetchall()
 cmd = ''
 cur = conn.cursor()
 for x in names:
-    cmd = 'INSERT INTO catalog(id, price) VALUES (\"' + x[0] + '\", ' + str(random.randrange(1, 500)) + ');'
+    cmd = 'INSERT INTO Contenir(id, quantity) VALUES (\"' + x[0] + '\", ' + str(random.randrange(1, 30)) + ');'
     cur.execute(cmd)
 
 conn.commit()
 conn.close()
-
