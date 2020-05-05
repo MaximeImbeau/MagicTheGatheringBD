@@ -1,0 +1,36 @@
+{% extends "navbar.html" %}
+{% block content %}
+<head>
+    <title>Welcome to MagicShop!</title>
+    <link rel="stylesheet" type="text/css" href="/../static/userDeck.css?v=1.10">
+</head>
+<body>
+    <table>
+        <tr>
+            <th>Selected Cards</th>
+        </tr>
+        {% for cardName in selectedCards %}
+        <tr >
+            <th>
+                <div class="sameLine">
+                    <form action="/../card_details/{{cardName}}" method='post'>
+                        <input class="deckName" type="submit" value="{{cardName}}">
+                    </form>
+                </div>
+                <div class="sameLine">
+                    <form action="/../card_selection" method="post">
+                        <input type="hidden" value="{{cardName}}" name="cardName">
+                        <input type="submit" value="+">
+                    </form>
+                </div>
+                <div class="sameLine">
+                     <form action="/../card_selection/{{cardName}}" method="delete">
+                        <input type="submit" value="-">
+                    </form>
+                </div>
+            </th>
+        </tr>
+        {% endfor %}
+    </table>
+</body>
+{% endblock %}

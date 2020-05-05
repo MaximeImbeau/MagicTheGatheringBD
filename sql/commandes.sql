@@ -1,11 +1,11 @@
-CREATE DATABASE IF NOT EXISTS testdb;
 USE testdb;
 
-CREATE TABLE IF NOT EXISTS Utilisateurs(courriel varchar(50), motpasse varchar(12), nom varchar(20), avatar varchar(40));
-INSERT INTO Utilisateurs VALUES("alice@ulaval.ca","12345","Alice", "MonChat.jpg"),("bob@ulaval.ca","qwerty","Bob", "Grimlock.jpg"),("cedric@ulaval.ca","password","C�dric","smiley.gif"),("denise@ulaval.ca","88888888","Denise","reine.jpg");
 
-CREATE TABLE IF NOT EXISTS Utilisateur(courriel varchar(50), motpasse varchar(12), nom varchar (20), balance float(4, 2) DEFAULT 0.0, PRIMARY KEY (courriel));
+CREATE TABLE IF NOT EXISTS Utilisateur(courriel varchar(50), motpasse varchar(64), nom varchar (20), balance float(4, 2) DEFAULT 0.0, PRIMARY KEY (courriel));
 INSERT INTO Utilisateur(courriel, motpasse, nom) VALUES("edgeLord@mail.com", "pain", "Bob");
+
+CREATE TABLE IF NOT EXISTS Suivre(email_user varchar(50), email_followed_user varchar(50), FOREIGN KEY (email_user) REFERENCES Utilisateur(courriel), PRIMARY KEY (email_user, email_followed_user), FOREIGN KEY (email_followed_user) REFERENCES Utilisateur(courriel));
+INSERT INTO Suivre(email_user, email_followed_user) VALUES("edgeLord@mail.com", "maxime@mai.ca");
 
 CREATE TABLE IF NOT EXISTS cards(name varchar(50), manaCost integer, rarity varchar(15), type varchar(15), imageSource varchar(100), PRIMARY KEY (name));
 INSERT INTO cards VALUES ('Air Elemental', 3, 'uncommon', 'creature', 'https://img.scryfall.com/cards/large/front/f/9/f9de2b27-f7d1-4e2d-97b2-2bb236b6fb10.jpg?1562002439'),
@@ -153,3 +153,40 @@ INSERT INTO card_colors VALUES ('Air Elemental', 'blue'), ('Ifnir Deadlands', 'b
 ('Ahn-Crop Champion', 'green'), ('Ahn-Crop Champion', 'white'), ('Akki Coalflinger', 'red'), ('Akroan Hoplite', 'red'),
 ('Akroan Hoplite', 'white'), ('Anathemancer', 'black'), ('Anathemancer', 'red'), ('Ancient Excavation', 'blue'),
 ('Ancient Excavation', 'white');
+
+
+CREATE TABLE IF NOT EXISTS Decks(deckId varchar(64), deckName varchar(50), numberOfCards int(3) DEFAULT 0, deckPrice float(4, 2) DEFAULT 0.00 , PRIMARY KEY (deckId));
+
+CREATE TABLE IF NOT EXISTS Decks_content(deckId varchar(64), card_name varchar(50), card_quantity Int(1), FOREIGN KEY (deckId) REFERENCES Decks(deckId), FOREIGN KEY (card_name) REFERENCES Cards(name), PRIMARY KEY (deckId, card_name));
+
+CREATE TABLE IF NOT EXISTS Deck_Owners(deckId varchar(64), owner_email varchar(50), FOREIGN KEY (deckId) REFERENCES Decks(deckId), FOREIGN KEY (owner_email) REFERENCES Utilisateur(courriel));
+
+CREATE TABLE IF NOT EXISTS Contenir(cardName varchar(50), quantity integer, FOREIGN KEY (cardName) REFERENCES cards(name));
+
+CREATE TABLE IF NOT EXISTS Catalog(cardName varchar(50), price integer, FOREIGN KEY (cardName) REFERENCES cards(name));
+
+delimiter //
+CREATE TRIGGER addedCardInDeck AFTER INSERT ON Decks_content
+	FOR EACH ROW
+    BEGIN
+		UPDATE Decks SET numberOfCards= numberOfCards+1 WHERE deckId = NEW.deckId;
+	END;//
+delimiter ;
+
+delimiter //
+CREATE TRIGGER updateCardInDeck AFTER UPDATE ON Decks_content
+	FOR EACH ROW
+    BEGIN
+		IF NEW.card_quantity > OLD.card_quantity THEN
+		UPDATE Decks SET numberOfCards= numberOfCards+1 WHERE deckId = NEW.deckId;
+        ELSE
+        UPDATE Decks SET numberOfCards= numberOfCards-1 WHERE deckId = NEW.deckId;
+        END IF;
+	END;//
+delimiter ;
+
+delimiter //
+CREATE TRIGGER cardInDeckRemoved BEFORE DELETE ON Decks_content
+	FOR EACH ROW
+        UPDATE Decks SET numberOfCards= numberOfCards-1 WHERE deckId = DELETED.deckId;
+delimiter ;

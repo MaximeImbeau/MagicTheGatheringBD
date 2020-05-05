@@ -1,0 +1,22 @@
+body {
+    background:url(https://cdn.shopify.com/s/files/1/2930/2308/products/dark-background-with-marble-texture-backdrop-for-photography_1024x1024.jpg?v=1551510514);
+    color: white;
+}
+
+table, th, td {
+  border: 1px solid black;
+  border-collapse: collapse;
+}
+
+.deckName{
+    text-decoration: underline;
+    color: white;
+    background: none;
+    outline: none;
+    border: none;
+    with: auto;
+}
+
+.sameLine {
+    float: left;
+}

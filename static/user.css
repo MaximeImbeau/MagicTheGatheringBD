@@ -1,18 +1,11 @@
 body {
     background:url(https://cdn.shopify.com/s/files/1/2930/2308/products/dark-background-with-marble-texture-backdrop-for-photography_1024x1024.jpg?v=1551510514);
-}
-h1 {
-  text-align: center;
-  padding:50px 0px 0px 0px;
-  text-transform:uppercase;
-  font:20px Arial;
-  color: white;
-  margin-bottom: 0px;
+    color: white;
 }
 form {
   width: 400px;
   color: white;
-  margin:50px auto;
+  margin:100px auto;
   text-shadow:#000 0px 1px 5px;
   text-align: center;
 }
@@ -38,4 +31,7 @@ input[type=submit]{
   text-transform:uppercase;
   background-color: #2E906F;
   color: white;
+}
+p{
+  text-align: center;
 }
