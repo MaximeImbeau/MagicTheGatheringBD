@@ -305,6 +305,28 @@ def removeCardFromDeck(deckId):
     conn.close()
     return render_template('deckContent.html', deckInfo=deckInfo, deckContent=deckContent, ownership=ownership)
 
+@app.route("/decks/<deckId>/delete")
+def deleteDeck(deckId):
+    conn = pymysql.connect(host='localhost', user='root', password=motDePasseDeLaDB, db='testdb')
+    cmd = 'Select * FROM Decks D INNER JOIN Deck_Owners D_O ON D.deckId = D_O.deckId WHERE D.deckId = '+'"'+deckId+'"'+ ";"
+    cur = conn.cursor()
+    cur.execute(cmd)
+
+    deckInfo = cur.fetchone()
+
+    if "courriel" in ProfileUtilisateur.keys():
+        if (deckInfo[5]) == ProfileUtilisateur["courriel"]:
+            cmd1 = "DELETE FROM Decks_content WHERE deckId = '"+deckId+"';"
+            cmd2 = "DELETE FROM Deck_Owners WHERE deckId = '"+deckId+"';"
+            cmd3 = "DELETE FROM Decks WHERE deckId = '"+deckId+"';"
+            cur.execute(cmd1)
+            cur.execute(cmd2)
+            cur.execute(cmd3)
+
+    conn.commit()
+    conn.close()
+    return getUserDecks(deckInfo[5])
+
 @app.route("/catalog")
 def get_cards():
     global image_sources
