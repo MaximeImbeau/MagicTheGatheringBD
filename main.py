@@ -6,7 +6,7 @@ import hashlib
 app = Flask(__name__)
 ProfileUtilisateur = {}
 
-motDePasseDeLaDB = "mtgserver"
+motDePasseDeLaDB = "kroot"
 
 #For catalog
 card_names = []
@@ -359,9 +359,6 @@ def addSelectedCard():
     conn.close()
     return render_template('catalog.html', names=card_names, image_sources=image_sources, message="The card was added to your Selection")
 
-
-
-    return render_template('cardDetails.html', cardDetails=[card, mana_cost, rarity, card_type, card_image, card_price, card_instock])
 
 def getCardPrice(cardName):
     conn = pymysql.connect(host='localhost', user='root', password='root', db='testdb')

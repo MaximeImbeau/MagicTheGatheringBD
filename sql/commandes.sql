@@ -115,6 +115,7 @@ INSERT INTO cards VALUES ('Air Elemental', 3, 'uncommon', 'creature', 'https://i
 ('Anathemancer', 3, 'uncommon', 'creature', 'https://img.scryfall.com/cards/large/front/a/b/ab106855-bd85-4c00-b596-c46d34f8cdd0.jpg?1562643508'),
 ('Ancient Excavation', 4, 'uncommon', 'instant', 'https://img.scryfall.com/cards/large/front/4/4/442f0af0-b745-49f2-9e95-2688403fc995.jpg?1562273826');
 
+CREATE INDEX name_index ON cards (name) USING HASH;
 
 CREATE TABLE IF NOT EXISTS card_colors(name varchar(50), color varchar(10), FOREIGN KEY (name) REFERENCES cards(name), PRIMARY KEY (name, color));
 INSERT INTO card_colors VALUES ('Air Elemental', 'blue'), ('Ifnir Deadlands', 'black'), ('Icatian Scout', 'white'),
@@ -154,10 +155,11 @@ INSERT INTO card_colors VALUES ('Air Elemental', 'blue'), ('Ifnir Deadlands', 'b
 ('Akroan Hoplite', 'white'), ('Anathemancer', 'black'), ('Anathemancer', 'red'), ('Ancient Excavation', 'blue'),
 ('Ancient Excavation', 'white');
 
+CREATE INDEX color_index ON card_colors (color) USING BTREE;
 
 CREATE TABLE IF NOT EXISTS Decks(deckId varchar(64), deckName varchar(50), numberOfCards int(3) DEFAULT 0, deckPrice float(4, 2) DEFAULT 0.00 , PRIMARY KEY (deckId));
 
-CREATE TABLE IF NOT EXISTS Decks_content(deckId varchar(64), card_name varchar(50), card_quantity Int(1), FOREIGN KEY (deckId) REFERENCES Decks(deckId), FOREIGN KEY (card_name) REFERENCES Cards(name), PRIMARY KEY (deckId, card_name));
+CREATE TABLE IF NOT EXISTS Decks_content(deckId varchar(64), card_name varchar(50), card_quantity Int(1), FOREIGN KEY (deckId) REFERENCES Decks(deckId), FOREIGN KEY (card_name) REFERENCES cards(name), PRIMARY KEY (deckId, card_name));
 
 CREATE TABLE IF NOT EXISTS Deck_Owners(deckId varchar(64), owner_email varchar(50), FOREIGN KEY (deckId) REFERENCES Decks(deckId), FOREIGN KEY (owner_email) REFERENCES Utilisateur(courriel));
 
